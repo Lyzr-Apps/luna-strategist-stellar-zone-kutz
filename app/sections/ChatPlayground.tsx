@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { callAIAgent } from '@/lib/aiAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -127,13 +127,13 @@ export default function ChatPlayground({ sampleMode }: ChatPlaygroundProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [sessionId, setSessionId] = useState('')
   const [selectedMessage, setSelectedMessage] = useState<ChatMessage | null>(null)
   const [statusMsg, setStatusMsg] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
+  const sessionIdRef = useRef<string>('')
 
   useEffect(() => {
-    setSessionId(crypto.randomUUID())
+    sessionIdRef.current = crypto.randomUUID()
   }, [])
 
   useEffect(() => {
@@ -152,9 +152,14 @@ export default function ChatPlayground({ sampleMode }: ChatPlaygroundProps) {
     }
   }, [messages, isLoading])
 
-  const handleSend = useCallback(async () => {
+  const handleSend = async () => {
     const trimmed = inputValue.trim()
     if (!trimmed || isLoading) return
+
+    // Ensure session ID exists
+    if (!sessionIdRef.current) {
+      sessionIdRef.current = crypto.randomUUID()
+    }
 
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
@@ -180,7 +185,7 @@ export default function ChatPlayground({ sampleMode }: ChatPlaygroundProps) {
           await new Promise(r => setTimeout(r, 1000 * attempt))
         }
 
-        const result = await callAIAgent(trimmed, LUNA_AGENT_ID, { session_id: sessionId })
+        const result = await callAIAgent(trimmed, LUNA_AGENT_ID, { session_id: sessionIdRef.current })
         const elapsedMs = Date.now() - startTime
 
         if (result.success) {
@@ -243,12 +248,12 @@ export default function ChatPlayground({ sampleMode }: ChatPlaygroundProps) {
     // All retries exhausted
     setStatusMsg(lastError || 'Failed to get response. Please try again.')
     setIsLoading(false)
-  }, [inputValue, isLoading, sessionId])
+  }
 
   const handleReset = () => {
     setMessages([])
     setSelectedMessage(null)
-    setSessionId(crypto.randomUUID())
+    sessionIdRef.current = crypto.randomUUID()
     setStatusMsg('Conversation reset. New session started.')
     setTimeout(() => setStatusMsg(''), 3000)
   }
@@ -342,12 +347,13 @@ export default function ChatPlayground({ sampleMode }: ChatPlaygroundProps) {
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
             placeholder="Ask Luna about Clash of Clans..."
             className="flex-1 bg-input border-border text-foreground placeholder:text-muted-foreground focus:ring-primary/50"
             disabled={isLoading}
           />
           <Button
+            type="button"
             onClick={handleSend}
             disabled={isLoading || !inputValue.trim()}
             className="bg-primary hover:bg-primary/80 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:shadow-primary/40"
