@@ -115,6 +115,19 @@ function normalizeResponse(parsed: any): NormalizedAgentResponse {
 }
 
 /**
+ * GET /api/agent — Health check
+ */
+export async function GET() {
+  return NextResponse.json({
+    status: 'ok',
+    agent_id: '69a2818ed6fa89687c20afa5',
+    provider: 'perplexity',
+    model: 'sonar-pro',
+    timestamp: new Date().toISOString(),
+  })
+}
+
+/**
  * POST /api/agent
  *
  * Two modes, both POST:

@@ -169,60 +169,80 @@ export default function ChatPlayground({ sampleMode }: ChatPlaygroundProps) {
 
     const startTime = Date.now()
 
-    try {
-      const result = await callAIAgent(trimmed, LUNA_AGENT_ID, { session_id: sessionId })
-      const elapsedMs = Date.now() - startTime
+    // Retry logic for transient network errors
+    const MAX_RETRIES = 2
+    let lastError = ''
 
-      if (result.success) {
-        const agentResult = result.response?.result || {}
-        const responseText = agentResult.response || result.response?.message || 'Luna could not generate a response.'
-        const topicsDiscussed = Array.isArray(agentResult.topics_discussed) ? agentResult.topics_discussed : []
-        const followUpQuestion = agentResult.follow_up_question || ''
-        const confidenceLevel = agentResult.confidence_level || 'medium'
-        const kbReferenced = agentResult.kb_referenced === true
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 0) {
+          setStatusMsg(`Retrying... (attempt ${attempt + 1})`)
+          await new Promise(r => setTimeout(r, 1000 * attempt))
+        }
 
-        const lunaMsg: ChatMessage = {
-          id: crypto.randomUUID(),
-          role: 'luna',
-          content: responseText,
-          timestamp: new Date().toISOString(),
-          metadata: {
-            topics_discussed: topicsDiscussed,
-            follow_up_question: followUpQuestion,
-            confidence_level: confidenceLevel,
-            kb_referenced: kbReferenced,
-          },
-        }
-        setMessages(prev => [...prev, lunaMsg])
-        setSelectedMessage(lunaMsg)
+        const result = await callAIAgent(trimmed, LUNA_AGENT_ID, { session_id: sessionId })
+        const elapsedMs = Date.now() - startTime
 
-        // Save to activity log in localStorage
-        const activityEntry: ActivityEntry = {
-          id: crypto.randomUUID(),
-          timestamp: new Date().toISOString(),
-          userQuery: trimmed.substring(0, 100),
-          lunaResponse: responseText.substring(0, 100),
-          topics: topicsDiscussed,
-          confidence: confidenceLevel,
-          kbUsed: kbReferenced,
-          responseTime: elapsedMs,
+        if (result.success) {
+          const agentResult = result.response?.result || {}
+          const responseText = agentResult.response || result.response?.message || 'Luna could not generate a response.'
+          const topicsDiscussed = Array.isArray(agentResult.topics_discussed) ? agentResult.topics_discussed : []
+          const followUpQuestion = agentResult.follow_up_question || ''
+          const confidenceLevel = agentResult.confidence_level || 'medium'
+          const kbReferenced = agentResult.kb_referenced === true
+
+          const lunaMsg: ChatMessage = {
+            id: crypto.randomUUID(),
+            role: 'luna',
+            content: responseText,
+            timestamp: new Date().toISOString(),
+            metadata: {
+              topics_discussed: topicsDiscussed,
+              follow_up_question: followUpQuestion,
+              confidence_level: confidenceLevel,
+              kb_referenced: kbReferenced,
+            },
+          }
+          setMessages(prev => [...prev, lunaMsg])
+          setSelectedMessage(lunaMsg)
+          setStatusMsg('')
+
+          // Save to activity log in localStorage
+          const activityEntry: ActivityEntry = {
+            id: crypto.randomUUID(),
+            timestamp: new Date().toISOString(),
+            userQuery: trimmed.substring(0, 100),
+            lunaResponse: responseText.substring(0, 100),
+            topics: topicsDiscussed,
+            confidence: confidenceLevel,
+            kbUsed: kbReferenced,
+            responseTime: elapsedMs,
+          }
+          try {
+            const existing = JSON.parse(localStorage.getItem('luna_activity_log') || '[]')
+            const updated = Array.isArray(existing) ? existing : []
+            updated.unshift(activityEntry)
+            localStorage.setItem('luna_activity_log', JSON.stringify(updated.slice(0, 500)))
+          } catch {
+            // localStorage may be unavailable
+          }
+          setIsLoading(false)
+          return // Success - exit retry loop
+        } else {
+          lastError = result.error || 'Failed to get response from Luna.'
+          // If it's not a network error, don't retry
+          if (!lastError.toLowerCase().includes('network') && !lastError.toLowerCase().includes('timeout')) {
+            break
+          }
         }
-        try {
-          const existing = JSON.parse(localStorage.getItem('luna_activity_log') || '[]')
-          const updated = Array.isArray(existing) ? existing : []
-          updated.unshift(activityEntry)
-          localStorage.setItem('luna_activity_log', JSON.stringify(updated.slice(0, 500)))
-        } catch {
-          // localStorage may be unavailable
-        }
-      } else {
-        setStatusMsg('Failed to get response from Luna. Please try again.')
+      } catch (err) {
+        lastError = err instanceof Error ? err.message : 'Network error'
       }
-    } catch {
-      setStatusMsg('Network error. Please check your connection and try again.')
-    } finally {
-      setIsLoading(false)
     }
+
+    // All retries exhausted
+    setStatusMsg(lastError || 'Failed to get response. Please try again.')
+    setIsLoading(false)
   }, [inputValue, isLoading, sessionId])
 
   const handleReset = () => {
