@@ -359,13 +359,13 @@ export default function ChatPlayground({ sampleMode }: ChatPlaygroundProps) {
 
                 <Separator className="bg-border" />
 
-                {/* KB Referenced */}
+                {/* Web Search / KB Referenced */}
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1.5 font-medium uppercase tracking-wider">Knowledge Base</p>
+                  <p className="text-xs text-muted-foreground mb-1.5 font-medium uppercase tracking-wider">Web Search</p>
                   <div className="flex items-center gap-2">
                     <div className={cn('w-2.5 h-2.5 rounded-full', selectedMessage.metadata.kb_referenced ? 'bg-accent shadow-sm shadow-accent/50' : 'bg-muted-foreground/30')} />
                     <span className="text-sm text-foreground">
-                      {selectedMessage.metadata.kb_referenced ? 'KB Referenced' : 'No KB Used'}
+                      {selectedMessage.metadata.kb_referenced ? 'Live Data Used' : 'No Search Performed'}
                     </span>
                   </div>
                 </div>

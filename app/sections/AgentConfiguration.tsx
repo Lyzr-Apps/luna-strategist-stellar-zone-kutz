@@ -24,8 +24,8 @@ interface AgentConfigurationProps {
 const PERSONALITY_RULES = [
   {
     icon: FiShield,
-    title: 'Anti-Hallucination',
-    desc: 'Luna admits uncertainty rather than fabricating game data. All responses are grounded in knowledge base content.',
+    title: 'Anti-Hallucination + Live Search',
+    desc: 'Luna uses real-time web search to verify all game facts. Never fabricates data — always grounded in the latest sources.',
     color: 'text-primary',
   },
   {
@@ -49,10 +49,10 @@ const PERSONALITY_RULES = [
 ]
 
 const MODEL_SETTINGS = [
-  { label: 'Model', value: 'GPT-4.1', progress: 100 },
+  { label: 'Model', value: 'Perplexity sonar-pro', progress: 100 },
   { label: 'Temperature', value: '0.65', progress: 65 },
   { label: 'Top P', value: '0.92', progress: 92 },
-  { label: 'Max Tokens', value: '2048', progress: 50 },
+  { label: 'Web Search', value: 'Built-in', progress: 100 },
 ]
 
 export default function AgentConfiguration({ sampleMode }: AgentConfigurationProps) {
