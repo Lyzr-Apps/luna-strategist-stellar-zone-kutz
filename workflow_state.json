@@ -1,0 +1,10 @@
+{
+  "agents": {
+    "luna_agent": {
+      "agent_id": "69a27b7299680de146f8c1e2",
+      "name": "Luna Agent",
+      "has_knowledge_base": true,
+      "rag_id": "69a27b54f572c99c0ffbe5b3"
+    }
+  }
+}

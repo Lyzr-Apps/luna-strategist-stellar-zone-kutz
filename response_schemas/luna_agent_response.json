@@ -1,0 +1,26 @@
+{
+  "agent_name": "Luna Agent",
+  "agent_id": "69a27b7299680de146f8c1e2",
+  "description": "Community mascot agent for a Clash of Clans Discord server. Engages members in strategy discussions, provides gameplay advice, hypes events, and sparks group participation with anti-hallucination safeguards.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "response": "string",
+    "topics_discussed": [
+      "string"
+    ],
+    "follow_up_question": "string",
+    "confidence_level": "string",
+    "kb_referenced": "boolean"
+  },
+  "example_response": {
+    "response": "Luna's conversational response to the user's message",
+    "topics_discussed": [
+      "sample string"
+    ],
+    "follow_up_question": "Optional follow-up question to drive engagement, empty string if none",
+    "confidence_level": "How confident Luna is in the accuracy of this response: 'high', 'medium', or 'low'",
+    "kb_referenced": false
+  }
+}

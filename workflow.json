@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "id": "input_node",
+      "type": "Input",
+      "label": "Discord Message",
+      "nodeCategory": "input"
+    },
+    {
+      "id": "luna_agent",
+      "type": "Agent",
+      "label": "Luna Agent",
+      "nodeCategory": "agent"
+    },
+    {
+      "id": "output_node",
+      "type": "Output",
+      "label": "Discord Response",
+      "nodeCategory": "end"
+    }
+  ],
+  "edges": [
+    {
+      "source": "input_node",
+      "target": "luna_agent"
+    },
+    {
+      "source": "luna_agent",
+      "target": "output_node"
+    }
+  ]
+}

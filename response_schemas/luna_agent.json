@@ -1,0 +1,14 @@
+{
+  "agent_name": "Luna Agent",
+  "agent_type": "json",
+  "accessor": "json",
+  "has_module_outputs": false,
+  "has_knowledge_base": true,
+  "schema": {
+    "response": "string - Luna's conversational response",
+    "topics_discussed": "array of strings - CoC topics covered",
+    "follow_up_question": "string - Optional follow-up question",
+    "confidence_level": "string - high/medium/low confidence",
+    "kb_referenced": "boolean - Whether KB was referenced"
+  }
+}
