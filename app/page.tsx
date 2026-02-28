@@ -16,7 +16,7 @@ import ChatPlayground from './sections/ChatPlayground'
 import AgentConfiguration from './sections/AgentConfiguration'
 import ActivityMonitor from './sections/ActivityMonitor'
 
-const LUNA_AGENT_ID = '69a27b7299680de146f8c1e2'
+const LUNA_AGENT_ID = '69a2818ed6fa89687c20afa5'
 const RAG_ID = '69a27b54f572c99c0ffbe5b3'
 
 const THEME_VARS = {

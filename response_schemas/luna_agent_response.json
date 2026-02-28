@@ -1,7 +1,7 @@
 {
   "agent_name": "Luna Agent",
-  "agent_id": "69a27b7299680de146f8c1e2",
-  "description": "Community mascot agent for a Clash of Clans Discord server. Engages members in strategy discussions, provides gameplay advice, hypes events, and sparks group participation with anti-hallucination safeguards.",
+  "agent_id": "69a2818ed6fa89687c20afa5",
+  "description": "Community mascot agent for a Clash of Clans Discord server. Uses real-time web search (Perplexity) to provide up-to-date gameplay advice, strategy discussions, event hype, and community engagement with anti-hallucination safeguards.",
   "agent_type": "json",
   "accessor": "result",
   "auto_generated": true,
@@ -20,7 +20,7 @@
       "sample string"
     ],
     "follow_up_question": "Optional follow-up question to drive engagement, empty string if none",
-    "confidence_level": "How confident Luna is in the accuracy of this response: 'high', 'medium', or 'low'",
+    "confidence_level": "How confident Luna is: high, medium, or low",
     "kb_referenced": false
   }
 }

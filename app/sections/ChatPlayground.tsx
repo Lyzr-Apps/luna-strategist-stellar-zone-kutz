@@ -14,7 +14,7 @@ import { GiSwordman } from 'react-icons/gi'
 import { HiSparkles } from 'react-icons/hi'
 import { BsLightningCharge } from 'react-icons/bs'
 
-const LUNA_AGENT_ID = '69a27b7299680de146f8c1e2'
+const LUNA_AGENT_ID = '69a2818ed6fa89687c20afa5'
 
 interface ChatMessage {
   id: string
