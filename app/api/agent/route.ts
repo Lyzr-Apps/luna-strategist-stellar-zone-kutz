@@ -102,6 +102,21 @@ function normalizeResponse(parsed: any): NormalizedAgentResponse {
     }
   }
 
+  // If parsed has 'response' as a string AND other fields (e.g. topics_discussed,
+  // confidence_level), treat the whole object as the result. This handles the common
+  // agent schema pattern: {response: "text", topics_discussed: [...], ...}
+  if ('response' in parsed && typeof parsed.response === 'string') {
+    const { response: responseText, ...otherFields } = parsed
+    if (Object.keys(otherFields).length > 0) {
+      return {
+        status: 'success',
+        result: { response: responseText, ...otherFields },
+        message: responseText,
+      }
+    }
+    return normalizeResponse(parsed.response)
+  }
+
   if ('response' in parsed) {
     return normalizeResponse(parsed.response)
   }

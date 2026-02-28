@@ -20,6 +20,25 @@
 import { useState } from 'react'
 import fetchWrapper from '@/lib/fetchWrapper'
 
+/**
+ * Resilient fetch that uses native fetch first, falling back to fetchWrapper.
+ * This avoids triggering parent iframe error reports on transient failures.
+ */
+async function resilientFetch(url: string, options: RequestInit): Promise<Response | undefined> {
+  try {
+    const response = await fetch(url, options)
+    return response
+  } catch {
+    // Native fetch failed (network-level). Try fetchWrapper as fallback
+    // which may handle redirects or other special cases.
+    try {
+      return await fetchWrapper(url, options)
+    } catch {
+      return undefined
+    }
+  }
+}
+
 // Types
 export interface NormalizedAgentResponse {
   status: 'success' | 'error'
@@ -88,7 +107,7 @@ export async function callAIAgent(
 ): Promise<AIAgentResponse> {
   try {
     // 1. Submit task — returns { task_id, agent_id, user_id, session_id }
-    const submitRes = await fetchWrapper('/api/agent', {
+    const submitRes = await resilientFetch('/api/agent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -132,7 +151,7 @@ export async function callAIAgent(
       await new Promise(r => setTimeout(r, delay))
       attempt++
 
-      const pollRes = await fetchWrapper('/api/agent', {
+      const pollRes = await resilientFetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ task_id }),

@@ -245,8 +245,12 @@ export default function ChatPlayground({ sampleMode }: ChatPlaygroundProps) {
       }
     }
 
-    // All retries exhausted
-    setStatusMsg(lastError || 'Failed to get response. Please try again.')
+    // All retries exhausted — show user-friendly error
+    let displayError = lastError || 'Failed to get response. Please try again.'
+    if (displayError.toLowerCase().includes('credits exhausted')) {
+      displayError = 'API credits exhausted. Please check your Lyzr account to add more credits.'
+    }
+    setStatusMsg(displayError)
     setIsLoading(false)
   }
 
